@@ -70,6 +70,9 @@ func init() {
 func initConfig() {
 	if cfgFile != "" {
 		// Use config file from the flag.
+
+
+
 		viper.SetConfigFile(cfgFile)
 	} else {
 		// Find home directory.
@@ -79,7 +82,7 @@ func initConfig() {
 			os.Exit(1)
 		}
 
-		// Search config in home directory with name ".acispanctl" (without extension).
+		// Search config in home directory with name ".acienv" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigName(".acienv")
 	}

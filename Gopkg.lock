@@ -119,10 +119,9 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:e7c75fd81d571373d1a86900c2b496dc930df09feb694431607e276b88cc700c"
+  digest = "1:ddaf832b8e4a818b4a05924c17a10a6e4b97e4ead460bc2f5c154a375a8d55f8"
   name = "github.com/ciscoecosystem/aci-go-client"
   packages = [
-    ".",
     "client",
     "container",
     "models",
@@ -790,7 +789,6 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/ciscoecosystem/aci-go-client",
     "github.com/ciscoecosystem/aci-go-client/client",
     "github.com/ciscoecosystem/aci-go-client/models",
     "github.com/mitchellh/go-homedir",
