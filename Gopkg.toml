@@ -52,4 +52,4 @@
 [[constraint]]
   branch = "master"
   name = "github.com/ciscoecosystem/aci-go-client"
-  source = "github.com/dshailen/aci-go-client"
+  source = "github.com/noironetworks/aci-go-client"
