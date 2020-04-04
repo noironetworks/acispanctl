@@ -29,53 +29,53 @@ import (
 )
 
 type Epg struct {
-	Name string `mapstructure:"name"`
+	Name   string `mapstructure:"name"`
 	Tenant string `mapstructure:"tenant"`
-	Ap string `mapstructure:"ap"`
+	Ap     string `mapstructure:"ap"`
 }
 
 type Path struct {
-	Pod string `mapstructure:"pod"`
+	Pod  string `mapstructure:"pod"`
 	Node string `mapstructure:"node"`
 	Port string `mapstructure:"port"`
 }
 
 type CEP struct {
 	Tenant string `mapstructure:"tenant"`
-	Ap string `mapstructure:"ap"`
-	Epg string `mapstructure:"epg"`
-	Mac string `mapstructure:"mac"`
+	Ap     string `mapstructure:"ap"`
+	Epg    string `mapstructure:"epg"`
+	Mac    string `mapstructure:"mac"`
 }
 
 type Destination struct {
-	Name string `mapstructure:"name"`
-	Ip string `mapstructure:"ip"`
-	Flowid uint `mapstructure:"flowid"`
-	Ttl uint8 `mapstructure:"ttl"`
-	Mtu uint `mapstructure:"mtu"`
-	Dscp string `mapstructure:"dscp"`
+	Name   string `mapstructure:"name"`
+	Ip     string `mapstructure:"ip"`
+	Flowid uint   `mapstructure:"flowid"`
+	Ttl    uint8  `mapstructure:"ttl"`
+	Mtu    uint   `mapstructure:"mtu"`
+	Dscp   string `mapstructure:"dscp"`
 }
 
 type DestinationGroup struct {
-	Name string `mapstructure:"name"`
-	Tag string `mapstructure:"tag"`
+	Name         string        `mapstructure:"name"`
+	Tag          string        `mapstructure:"tag"`
 	Destinations []Destination `mapstructure:"destinations"`
 }
 
 type Source struct {
-	Name string `mapstructure:"name"`
+	Name      string `mapstructure:"name"`
 	Direction string `mapstructure:"direction"`
-	Epg Epg `mapstructure:"epg"`
-	Path Path `mapstructure:"path"`
-	Cep CEP `mapstructure:"cep"`
+	Epg       Epg    `mapstructure:"epg"`
+	Path      Path   `mapstructure:"path"`
+	Cep       CEP    `mapstructure:"cep"`
 }
 
 type SpanSession struct {
-	Name string `mapstructure:"name"`
+	Name               string             `mapstructure:"name"`
 	Destination_Groups []DestinationGroup `mapstructure:"destination_groups"`
-	Sources []Source `mapstructure:"sources"`
-	Admin_state string `mapstructure:"admin_state"`
-	State string `mapstructure:"state"`
+	Sources            []Source           `mapstructure:"sources"`
+	Admin_state        string             `mapstructure:"admin_state"`
+	State              string             `mapstructure:"state"`
 }
 
 type SpanConfig struct {
@@ -148,54 +148,8 @@ func GetAPICClient() *client.Client {
 	username := viper.GetString("aciauth.username")
 	password := viper.GetString("aciauth.password")
 
-    return client.GetClient(hosturl, username, client.Password(password), client.Insecure(true))
+	return client.GetClient(hosturl, username, client.Password(password), client.Insecure(true))
 }
-
-//func GetAllTenantsX() {
-//	c := GetAPICClient()
-//	path := "api/class/fvTenant.json"
-//	className := "fvTenant"
-//	cont, err := c.GetViaURL(path)
-//	if err != nil {
-//		fmt.Println("error while retrieving tenants")
-//		os.Exit(1)
-//	}
-//	dn := cont.Search("imdata", className, "attributes", "name")
-//	fmt.Println(dn)
-//}
-//
-//func GetAllTenants() {
-//	c := GetAPICClient()
-//	tlist, err := c.ServiceManager.ListTenant()
-//	if err != nil {
-//		fmt.Println("error while retrieving all tenants")
-//		os.Exit(1)
-//	}
-//	for _, v := range(tlist) {
-//		fmt.Printf("%s\n",models.GetMOName(v.DistinguishedName))
-//	}
-//}
-//
-//func CreateTenant(dn string, desc string) (*models.Tenant, error) {
-//	c := GetAPICClient()
-//	tenant := models.NewTenant(fmt.Sprintf("tn-%s", dn), "uni", desc, models.TenantAttributes{})
-//	err := c.Save(tenant)
-//	return tenant, err
-//}
-//
-//
-//func DeleteTenantX(dn string) (*models.Tenant, error) {
-//	c := GetAPICClient()
-//	tenant := models.NewTenant(fmt.Sprintf("tn-%s", dn), "uni", "", models.TenantAttributes{})
-//	err :=  c.Delete(tenant)
-//	return tenant, err
-//}
-//
-//func DeleteTenant(dn string) (error) {
-//	c := GetAPICClient()
-//	err := c.ServiceManager.DeleteTenant(dn)
-//	return err
-//}
 
 //func CreateVSPANSessionX(sgname string, sources []string, desc string, dstips []string, lbltag string, flowid string,
 //	ttl string, mtu string, dscp string) (*models.SpanVSrcGrp, error) {
@@ -259,31 +213,35 @@ func GetAPICClient() *client.Client {
 //	return spanSrcGrp, err
 //}
 
-func StartVSPANSession(spanSrcGrpName string) (error) {
+func StartVSPANSession(spanSrcGrpName string) error {
 	c := GetAPICClient()
 	_, err := c.ServiceManager.StateUpdateSpanVSrcGrp(spanSrcGrpName, "start")
 	return err
 }
 
-func StopVSPANSession(spanSrcGrpName string) (error) {
+func StopVSPANSession(spanSrcGrpName string) error {
 	c := GetAPICClient()
 	spanSrcGrp, err := c.ServiceManager.ReadSpanVSrcGrp(spanSrcGrpName)
 	if err != nil {
-		fmt.Printf("error while reading span group %s\n",spanSrcGrpName,)
+		fmt.Printf("error while reading span group %s\n", spanSrcGrpName)
 		os.Exit(1)
 	}
 	spanVSrcGrpAttr := spanSrcGrp.SpanVSrcGrpAttributes
 	desc := spanSrcGrp.Description
 	spanVSrcGrpAttr.AdminSt = "stop"
-	c.UpdateSpanVSrcGrp(spanSrcGrpName, desc, spanVSrcGrpAttr)
+	_, err = c.UpdateSpanVSrcGrp(spanSrcGrpName, desc, spanVSrcGrpAttr)
+	if err != nil {
+		fmt.Printf("error while updating span group %s\n", spanSrcGrpName)
+		os.Exit(1)
+	}
 	return nil
 }
 
-func ApplyVSPANConfig(config SpanConfig) (error) {
+func ApplyVSPANConfig(config SpanConfig) error {
 	c := GetAPICClient()
 	//fmt.Println("creating span source group")
 	desc := "created using Go binding lib" // FIXME: read from config
-	for _,session := range(config.Sessions) {
+	for _, session := range config.Sessions {
 		// Create span session group
 		spanVSrcGrpAttr := models.SpanVSrcGrpAttributes{}
 		spanVSrcGrpAttr.AdminSt = session.Admin_state
@@ -298,18 +256,18 @@ func ApplyVSPANConfig(config SpanConfig) (error) {
 			_ = spanSrcGrp
 
 			// Create span destination groups
-			for _, destg := range(session.Destination_Groups) {
+			for _, destg := range session.Destination_Groups {
 				dgname := destg.Name
 				spanDstGrp, err := c.ServiceManager.CreateSpanVDestGrp(dgname, desc, models.SpanVDestGrpAttributes{})
 				if err != nil {
 					fmt.Printf("error while creating span destination group %s\n", dgname)
 					return err
 				}
-				for _, dest := range(destg.Destinations) {
+				for _, dest := range destg.Destinations {
 					dstname := dest.Name
 					spanDst, err := c.ServiceManager.CreateSpanVDest(dstname, models.GetMOName(spanDstGrp.DistinguishedName), desc, models.SpanVDestAttributes{})
 					if err != nil {
-						fmt.Printf("error while creating span destination %s, spanDstGrp=%s\n",dstname, models.GetMOName(spanDstGrp.DistinguishedName))
+						fmt.Printf("error while creating span destination %s, spanDstGrp=%s\n", dstname, models.GetMOName(spanDstGrp.DistinguishedName))
 						return err
 					}
 					spanVEpgSummaryattr := models.SpanVEpgSummaryAttributes{}
@@ -324,33 +282,33 @@ func ApplyVSPANConfig(config SpanConfig) (error) {
 			}
 
 			// Create source span labels for every destination groups defined in the config
-			for _, destg := range(session.Destination_Groups) {
+			for _, destg := range session.Destination_Groups {
 				dgname := destg.Name
 				_, err := c.ServiceManager.CreateSpanVSpanLbl(dgname, models.GetMOName(spanSrcGrp.DistinguishedName), desc, models.SpanVSpanLblAttributes{})
 				if err != nil {
-					fmt.Printf("error while creating span label %s, spanSrcGrp=%s\n",dgname, models.GetMOName(spanSrcGrp.DistinguishedName))
+					fmt.Printf("error while creating span label %s, spanSrcGrp=%s\n", dgname, models.GetMOName(spanSrcGrp.DistinguishedName))
 					return err
 				}
 			}
 
 			// Create span sources
-			for _, source := range(session.Sources) {
+			for _, source := range session.Sources {
 				srcname := source.Name
 				spanVSrcattr := models.SpanVSrcAttributes{}
 				spanVSrcattr.Dir = strings.ToLower(source.Direction)
 				_, err := c.ServiceManager.CreateSpanVSrc(srcname, models.GetMOName(spanSrcGrp.DistinguishedName), desc, spanVSrcattr)
 				if err != nil {
-					fmt.Printf("error while creating span source %s in spanSrcGrp=%s\n",srcname, models.GetMOName(spanSrcGrp.DistinguishedName))
+					fmt.Printf("error while creating span source %s in spanSrcGrp=%s\n", srcname, models.GetMOName(spanSrcGrp.DistinguishedName))
 					return err
 				}
 				//parentDn is common for all 3 types
 				parentDn := fmt.Sprintf("uni/infra/vsrcgrp-%s/vsrc-%s", models.GetMOName(spanSrcGrp.DistinguishedName), source.Name)
 				// PathEp
-				if source.Path.Port != "" && source.Path.Node != "" && source.Path.Pod != ""{
+				if source.Path.Port != "" && source.Path.Node != "" && source.Path.Pod != "" {
 					tDn := fmt.Sprintf("topology/pod-%s/paths-%s/pathep-[%s]", source.Path.Pod, source.Path.Node, source.Path.Port)
 					err = c.ServiceManager.CreateRelationSpanRsSrcToPathEp(parentDn, tDn)
 					if err != nil {
-						fmt.Printf("error while creating span source path %s in spanSrcGrp=%s\n",srcname, models.GetMOName(spanSrcGrp.DistinguishedName))
+						fmt.Printf("error while creating span source path %s in spanSrcGrp=%s\n", srcname, models.GetMOName(spanSrcGrp.DistinguishedName))
 						return err
 					}
 				}
@@ -359,7 +317,7 @@ func ApplyVSPANConfig(config SpanConfig) (error) {
 					tDn := fmt.Sprintf("uni/tn-%s/ap-%s/epg-%s/cep-%s", source.Cep.Tenant, source.Cep.Ap, source.Cep.Epg, source.Cep.Mac)
 					err = c.ServiceManager.CreateRelationSpanRsSrcToVPort(parentDn, tDn)
 					if err != nil {
-						fmt.Printf("error while creating span source CEP %s in spanSrcGrp=%s\n",srcname, models.GetMOName(spanSrcGrp.DistinguishedName))
+						fmt.Printf("error while creating span source CEP %s in spanSrcGrp=%s\n", srcname, models.GetMOName(spanSrcGrp.DistinguishedName))
 						return err
 					}
 				}
@@ -368,7 +326,7 @@ func ApplyVSPANConfig(config SpanConfig) (error) {
 					tDn := fmt.Sprintf("uni/tn-%s/ap-%s/epg-%s", source.Epg.Tenant, source.Epg.Ap, source.Epg.Name)
 					err = c.ServiceManager.CreateRelationSpanRsSrcToEpg(parentDn, tDn)
 					if err != nil {
-						fmt.Printf("error while creating span source epg %s in spanSrcGrp=%s\n",srcname, models.GetMOName(spanSrcGrp.DistinguishedName))
+						fmt.Printf("error while creating span source epg %s in spanSrcGrp=%s\n", srcname, models.GetMOName(spanSrcGrp.DistinguishedName))
 						return err
 					}
 				}
@@ -384,7 +342,7 @@ func ApplyVSPANConfig(config SpanConfig) (error) {
 			}
 
 			// delete all related span destination groups
-			for _, destg := range(session.Destination_Groups) {
+			for _, destg := range session.Destination_Groups {
 				dgname := destg.Name
 				err := c.ServiceManager.DeleteSpanVDestGrp(dgname)
 				if err != nil {
@@ -397,9 +355,8 @@ func ApplyVSPANConfig(config SpanConfig) (error) {
 	return nil
 }
 
-func DeleteVSPANSession(sgname string) (error) {
+func DeleteVSPANSession(sgname string) error {
 	c := GetAPICClient()
-
 
 	spanLblMol, err := c.ServiceManager.ListSpanVSpanLbl()
 	if err != nil {
@@ -436,7 +393,7 @@ func DeleteVSPANSession(sgname string) (error) {
 				}
 			}
 
-			if  err != nil || maxAttempted {
+			if err != nil || maxAttempted {
 				fmt.Printf("error deleting...%s\n", spanLblMo.Name)
 				fmt.Println(err)
 			}
@@ -460,7 +417,7 @@ func PrintAllOpflexIDEp() {
 	table.SetRowLine(true)
 	table.SetRowSeparator("-")
 
-	for _, opflexIDEp := range(opflexIDEps) {
+	for _, opflexIDEp := range opflexIDEps {
 		if opflexIDEp.ContainerName != "" {
 			s := strings.Split(opflexIDEp.EpgPKey, "/")
 			tenant := strings.TrimPrefix(s[1], "tn-")
@@ -475,7 +432,6 @@ func PrintAllOpflexIDEp() {
 	fmt.Println(tableString.String())
 }
 
-
 func CreateSpanSessionFromCont(cont string, domain string, namespace string, dst_ip string) error {
 	c := GetAPICClient()
 	opflexIDEps, err := c.ServiceManager.ListOpflexIDEp()
@@ -484,7 +440,7 @@ func CreateSpanSessionFromCont(cont string, domain string, namespace string, dst
 		os.Exit(1)
 	}
 	spanConfig := SpanConfig{}
-	for _, opflexIDEp := range(opflexIDEps) {
+	for _, opflexIDEp := range opflexIDEps {
 		if opflexIDEp.ContainerName == cont && opflexIDEp.DomName == domain && opflexIDEp.Namespace == namespace {
 			s := strings.Split(opflexIDEp.EpgPKey, "/")
 			tenant := strings.TrimPrefix(s[1], "tn-")
@@ -500,7 +456,6 @@ func CreateSpanSessionFromCont(cont string, domain string, namespace string, dst
 	return errors.New(err_str)
 }
 
-
 func PrintAllVSPANSessions() {
 	c := GetAPICClient()
 	tableString := &strings.Builder{}
@@ -515,13 +470,13 @@ func PrintAllVSPANSessions() {
 	var spanSrcMap = make(map[string]string)
 	var spanDstIpMap = make(map[string]string)
 
-	for _, session := range(spansessions) {
+	for _, session := range spansessions {
 		if models.GetMOName(session.DistinguishedName) == "default" {
 			//skip processing default sessions
 			continue
 		}
 
-		spanlbll  := ""
+		spanlbll := ""
 		srctaeml := ""
 		spanLblMol, err := c.ServiceManager.ListSpanVSpanLbl()
 		if err != nil {
@@ -549,7 +504,7 @@ func PrintAllVSPANSessions() {
 					fmt.Println(err)
 					os.Exit(1)
 				}
-				for _, spanDst := range(spanDstl) {
+				for _, spanDst := range spanDstl {
 					if strings.TrimPrefix(strings.Split(spanDst.DistinguishedName, "/")[2], "vdestgrp-") != models.GetMOName(spanLblMo.DistinguishedName) {
 						continue
 					}
@@ -572,13 +527,12 @@ func PrintAllVSPANSessions() {
 						}
 
 					}
-					dstipl = fmt.Sprintf("%s %s",dstipl, epg_attr.DstIp)
+					dstipl = fmt.Sprintf("%s %s", dstipl, epg_attr.DstIp)
 				}
-				spanDstIpMap[models.GetMOName(session.DistinguishedName)] = fmt.Sprintf("%s %s",spanDstIpMap[models.GetMOName(session.DistinguishedName)], dstipl)
+				spanDstIpMap[models.GetMOName(session.DistinguishedName)] = fmt.Sprintf("%s %s", spanDstIpMap[models.GetMOName(session.DistinguishedName)], dstipl)
 			}
 		}
 		spanLblMap[models.GetMOName(session.DistinguishedName)] = spanlbll
-
 
 		spanSrcMol, err := c.ServiceManager.ListSpanVSrc(models.GetMOName(session.DistinguishedName))
 		if err != nil {
@@ -613,9 +567,9 @@ func PrintAllVSPANSessions() {
 				}
 			}
 
-			for _, spanRsSrcToVPort := range(spanRsSrcToVPortL) {
-				session_name_str :=  strings.TrimPrefix(strings.Split(spanRsSrcToVPort.DistinguishedName, "/")[2], "vsrcgrp-")
-				span_src_name_str :=  strings.TrimPrefix(strings.Split(spanRsSrcToVPort.DistinguishedName, "/")[3], "vsrc-")
+			for _, spanRsSrcToVPort := range spanRsSrcToVPortL {
+				session_name_str := strings.TrimPrefix(strings.Split(spanRsSrcToVPort.DistinguishedName, "/")[2], "vsrcgrp-")
+				span_src_name_str := strings.TrimPrefix(strings.Split(spanRsSrcToVPort.DistinguishedName, "/")[3], "vsrc-")
 				if session_name_str != models.GetMOName(session.DistinguishedName) && span_src_name_str != models.GetMOName(spanSrcMo.DistinguishedName) {
 					continue
 				}
@@ -639,7 +593,7 @@ func PrintAllVSPANSessions() {
 	table.SetAlignment(tablewriter.ALIGN_LEFT)
 	table.SetRowLine(true)
 	table.SetRowSeparator("-")
-	for _, session := range(spansessions) {
+	for _, session := range spansessions {
 		if models.GetMOName(session.DistinguishedName) != "default" {
 			table.Append([]string{models.GetMOName(session.DistinguishedName), spanSrcMap[models.GetMOName(session.DistinguishedName)],
 				spanDstIpMap[models.GetMOName(session.DistinguishedName)], session.AdminSt})

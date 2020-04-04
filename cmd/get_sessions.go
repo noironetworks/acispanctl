@@ -46,4 +46,3 @@ func init() {
 	// is called directly, e.g.:
 	// sessionsCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
-

@@ -15,8 +15,8 @@
 package cmd
 
 import (
-	"github.com/noironetworks/acispanctl/pkg/acispanctl"
 	"fmt"
+	"github.com/noironetworks/acispanctl/pkg/acispanctl"
 
 	"github.com/spf13/cobra"
 )
@@ -32,14 +32,14 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		name, _:= cmd.Flags().GetString("name")
+		name, _ := cmd.Flags().GetString("name")
 		if name == "" {
 			fmt.Println("You must specify a name for the session to start.")
 			return
 		}
 		err := acispanctl.StartVSPANSession(name)
 		if err != nil {
-			fmt.Printf("error while starting span session %s\n", name, err)
+			fmt.Printf("error while starting span session %s. %+v\n\n", name, err)
 		}
 	},
 }

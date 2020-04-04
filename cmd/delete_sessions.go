@@ -15,8 +15,8 @@
 package cmd
 
 import (
-	"github.com/noironetworks/acispanctl/pkg/acispanctl"
 	"fmt"
+	"github.com/noironetworks/acispanctl/pkg/acispanctl"
 
 	"github.com/spf13/cobra"
 )
@@ -33,12 +33,15 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		name, _:= cmd.Flags().GetString("name")
+		name, _ := cmd.Flags().GetString("name")
 		if name == "" {
 			fmt.Println("You must specify a name for the session to delete using -n option.")
 		}
 		spanSessionName := name
-		acispanctl.DeleteVSPANSession(spanSessionName)
+		err := acispanctl.DeleteVSPANSession(spanSessionName)
+		if err != nil {
+			fmt.Printf("Unexpected error when deleting VSPAN session named %s. %+v\n", spanSessionName, err)
+		}
 	},
 }
 

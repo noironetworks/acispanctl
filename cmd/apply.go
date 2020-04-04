@@ -15,11 +15,11 @@
 package cmd
 
 import (
-	"github.com/noironetworks/acispanctl/pkg/acispanctl"
 	"fmt"
+	"github.com/noironetworks/acispanctl/pkg/acispanctl"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
-	"github.com/spf13/cobra"
 )
 
 // applyCmd represents the apply command
@@ -32,7 +32,7 @@ E.g. acispanctl apply -f <filename>`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 		//fmt.Println("apply called")
-		dfilename, _:= cmd.Flags().GetString("file")
+		dfilename, _ := cmd.Flags().GetString("file")
 		if dfilename == "" {
 			fmt.Println("error: must specify -f")
 			os.Exit(1)
@@ -41,7 +41,7 @@ E.g. acispanctl apply -f <filename>`,
 		viper.AddConfigPath(".")
 		viper.SetConfigFile(dfilename)
 		err := viper.ReadInConfig() // Find and read the config file
-		if err != nil { // Handle errors reading the config file
+		if err != nil {             // Handle errors reading the config file
 			//panic(fmt.Errorf("Fatal error config file: %s \n", err))
 			fmt.Printf("error while opening the span definition file. %+v\n", err)
 			os.Exit(1)
@@ -55,14 +55,11 @@ E.g. acispanctl apply -f <filename>`,
 		}
 		err = acispanctl.ApplyVSPANConfig(C)
 		if err != nil {
-			fmt.Printf("unable to apply vspan config %+v\n", C, err)
+			fmt.Printf("unable to apply vspan config %+v\n", err)
 			os.Exit(1)
 		}
-		//viper.WriteConfigAs("test.yaml")
 	},
 }
-
-
 
 func init() {
 	rootCmd.AddCommand(applyCmd)

@@ -41,7 +41,6 @@ func init() {
 	createSessionsCmd.Flags().StringP("namespace", "n", "", "Container Namespace")
 	createSessionsCmd.Flags().StringP("destination", "t", "", "ER SPAN target destination")
 
-
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command

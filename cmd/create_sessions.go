@@ -15,8 +15,8 @@
 package cmd
 
 import (
-	"github.com/noironetworks/acispanctl/pkg/acispanctl"
 	"fmt"
+	"github.com/noironetworks/acispanctl/pkg/acispanctl"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
@@ -34,30 +34,29 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		cont, _:= cmd.Flags().GetString("container")
+		cont, _ := cmd.Flags().GetString("container")
 		if cont == "" {
 			fmt.Println("specify name of a container to span using -c")
 			return
 		}
 
-		dest, _:= cmd.Flags().GetString("destination")
+		dest, _ := cmd.Flags().GetString("destination")
 		if dest == "" {
 			fmt.Println("specify ER SPAN destination using -t")
 			return
 		}
 
-		domain, _:= cmd.Flags().GetString("domain")
+		domain, _ := cmd.Flags().GetString("domain")
 		if domain == "" {
 			fmt.Println("WARN: using default domain kube")
 			domain = "kube"
 		}
 
-		namespace, _:= cmd.Flags().GetString("namespace")
+		namespace, _ := cmd.Flags().GetString("namespace")
 		if namespace == "" {
 			fmt.Println("WARN: using default namespace default")
 			namespace = "default"
 		}
-
 
 		err := acispanctl.CreateSpanSessionFromCont(cont, domain, namespace, dest)
 		if err != nil { // Handle errors creating the config file
@@ -69,7 +68,7 @@ to quickly create a Cobra application.`,
 		viper.AddConfigPath(".")
 		viper.SetConfigFile(fname)
 		err = viper.ReadInConfig() // Find and read the config file
-		if err != nil { // Handle errors reading the config file
+		if err != nil {            // Handle errors reading the config file
 			fmt.Printf("error while opening the span definition file. %+v\n", err)
 			os.Exit(1)
 		}
@@ -82,7 +81,7 @@ to quickly create a Cobra application.`,
 		}
 		err = acispanctl.ApplyVSPANConfig(C)
 		if err != nil {
-			fmt.Printf("unable to apply vspan config %+v", C, err)
+			fmt.Printf("unable to apply vspan config %+v", err)
 			os.Exit(1)
 		}
 	},
