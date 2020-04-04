@@ -14,7 +14,7 @@
 
 package main
 
-import "acispanctl/cmd"
+import "github.com/noironetworks/acispanctl/cmd"
 
 func main() {
 	cmd.Execute()

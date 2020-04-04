@@ -15,7 +15,7 @@
 package cmd
 
 import (
-	"acispanctl/pkg/acispanctl"
+	"github.com/noironetworks/acispanctl/pkg/acispanctl"
 	"fmt"
 
 	"github.com/spf13/cobra"
