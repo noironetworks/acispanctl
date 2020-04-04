@@ -148,7 +148,7 @@ func GetAPICClient() *client.Client {
 	username := viper.GetString("aciauth.username")
 	password := viper.GetString("aciauth.password")
 
-    return client.GetClient(hosturl, username, client.Insecure(true), client.Password(password))
+    return client.GetClient(hosturl, username, client.Password(password), client.Insecure(true))
 }
 
 //func GetAllTenantsX() {

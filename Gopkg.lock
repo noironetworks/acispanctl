@@ -128,7 +128,7 @@
   ]
   pruneopts = "UT"
   revision = "021ba6a5425faafe0b730c1ee0713156dedc3488"
-  source = "github.com/dshailen/aci-go-client"
+  source = "github.com/noironetworks/aci-go-client"
 
 [[projects]]
   digest = "1:865079840386857c809b72ce300be7580cb50d3d3129ce11bf9aa6ca2bc1934a"
@@ -454,12 +454,12 @@
   version = "v1.0.1"
 
 [[projects]]
-  digest = "1:abcdbf03ca6ca13d3697e2186edc1f33863bbdac2b3a44dfa39015e8903f7409"
+  digest = "1:b8261a46d75566ebf5b4fb6bb762f54f47e6633e0995118393afc80bb1f428f5"
   name = "github.com/olekukonko/tablewriter"
   packages = ["."]
   pruneopts = "UT"
-  revision = "e6d60cf7ba1f42d86d54cdf5508611c4aafb3970"
-  version = "v0.0.1"
+  revision = "876dd0e0227ec99c0243b639b92139915b65331a"
+  version = "v0.0.4"
 
 [[projects]]
   digest = "1:93131d8002d7025da13582877c32d1fc302486775a1b06f62241741006428c5e"
@@ -778,12 +778,12 @@
   version = "v1.21.1"
 
 [[projects]]
-  digest = "1:4d2e5a73dc1500038e504a8d78b986630e3626dc027bc030ba5c75da257cdb96"
+  digest = "1:55b110c99c5fdc4f14930747326acce56b52cfce60b24b1c03ef686ac0e46bb1"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
   pruneopts = "UT"
-  revision = "51d6538a90f86fe93ac480b35f37b2be17fef232"
-  version = "v2.2.2"
+  revision = "53403b58ad1b561927d19068c655246f2db79d48"
+  version = "v2.2.8"
 
 [solve-meta]
   analyzer-name = "dep"
