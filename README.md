@@ -33,5 +33,6 @@ vi $HOME/work/src/acispanctl/sampleconfig
 ```
 
 Known Issues:
-1. The command does not retrive or configure the SPAN sessions on ACI. Root cause: REST API calls to APIC timesout
+1. The command does not retrieve or configure the SPAN sessions on ACI. Root cause: REST API calls to APIC timesout
 Workaround: Rerun the command
+2. The POST to bind the src/dest grp to the associated channels in the AEP has not been implemented

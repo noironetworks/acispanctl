@@ -144,7 +144,7 @@ func SaveSpanConfig(c SpanConfig, filename string) error {
 }
 
 func GetAPICClient() *client.Client {
-	hosturl := fmt.Sprintf("https://%s", viper.GetString("acihost"))
+	hosturl := fmt.Sprintf("%s://%s", viper.GetString("aciprotocol"), viper.GetString("acihost"))
 	username := viper.GetString("aciauth.username")
 	password := viper.GetString("aciauth.password")
 

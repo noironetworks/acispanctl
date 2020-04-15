@@ -1,4 +1,5 @@
 acihost: 12.8.84.2
+aciprotocol: https
 aciauth:
   username: admin
   password: thepassword
