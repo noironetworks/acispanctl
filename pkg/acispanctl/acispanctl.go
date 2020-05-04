@@ -71,11 +71,11 @@ type Source struct {
 }
 
 type SpanSession struct {
-	Name               string             `mapstructure:"name"`
-	Destination_Groups []DestinationGroup `mapstructure:"destination_groups"`
-	Sources            []Source           `mapstructure:"sources"`
-	Admin_state        string             `mapstructure:"admin_state"`
-	State              string             `mapstructure:"state"`
+	Name              string             `mapstructure:"name"`
+	DestinationGroups []DestinationGroup `mapstructure:"destination_groups"`
+	Sources           []Source           `mapstructure:"sources"`
+	AdminState        string             `mapstructure:"admin_state"`
+	State             string             `mapstructure:"state"`
 }
 
 type SpanConfig struct {
@@ -124,11 +124,11 @@ func NewSpanCEPSession(prefix string, tn string, ap string, epg string, mac stri
 	spanSource.Cep = cep
 
 	//assign destination group to span session
-	spanSession.Destination_Groups = append(spanSession.Destination_Groups, dstGrp)
+	spanSession.DestinationGroups = append(spanSession.DestinationGroups, dstGrp)
 
 	//assign span source to span session
 	spanSession.Sources = append(spanSession.Sources, spanSource)
-	spanSession.Admin_state = "start"
+	spanSession.AdminState = "start"
 	spanSession.State = "present"
 
 	return spanSession
@@ -239,13 +239,11 @@ func StopVSPANSession(spanSrcGrpName string) error {
 
 func ApplyVSPANConfig(config SpanConfig) error {
 	c := GetAPICClient()
-	//fmt.Println("creating span source group")
 	desc := "created using Go binding lib" // FIXME: read from config
 	for _, session := range config.Sessions {
 		// Create span session group
 		spanVSrcGrpAttr := models.SpanVSrcGrpAttributes{}
-		spanVSrcGrpAttr.AdminSt = session.Admin_state
-		//fmt.Printf("Session: %s, state: %s\n", session.Name, session.Admin_state)
+		spanVSrcGrpAttr.AdminSt = session.AdminState
 		sessionState := strings.ToLower(session.State) // present(add) or absent(delete)
 		if sessionState == "present" {
 			spanSrcGrp, err := c.ServiceManager.CreateSpanVSrcGrp(session.Name, desc, spanVSrcGrpAttr)
@@ -256,7 +254,7 @@ func ApplyVSPANConfig(config SpanConfig) error {
 			_ = spanSrcGrp
 
 			// Create span destination groups
-			for _, destg := range session.Destination_Groups {
+			for _, destg := range session.DestinationGroups {
 				dgname := destg.Name
 				spanDstGrp, err := c.ServiceManager.CreateSpanVDestGrp(dgname, desc, models.SpanVDestGrpAttributes{})
 				if err != nil {
@@ -282,7 +280,7 @@ func ApplyVSPANConfig(config SpanConfig) error {
 			}
 
 			// Create source span labels for every destination groups defined in the config
-			for _, destg := range session.Destination_Groups {
+			for _, destg := range session.DestinationGroups {
 				dgname := destg.Name
 				_, err := c.ServiceManager.CreateSpanVSpanLbl(dgname, models.GetMOName(spanSrcGrp.DistinguishedName), desc, models.SpanVSpanLblAttributes{})
 				if err != nil {
@@ -342,7 +340,7 @@ func ApplyVSPANConfig(config SpanConfig) error {
 			}
 
 			// delete all related span destination groups
-			for _, destg := range session.Destination_Groups {
+			for _, destg := range session.DestinationGroups {
 				dgname := destg.Name
 				err := c.ServiceManager.DeleteSpanVDestGrp(dgname)
 				if err != nil {
@@ -432,7 +430,7 @@ func PrintAllOpflexIDEp() {
 	fmt.Println(tableString.String())
 }
 
-func CreateSpanSessionFromCont(cont string, domain string, namespace string, dst_ip string) error {
+func CreateSpanSessionFromCont(cont string, domain string, namespace string, dstIp string) error {
 	c := GetAPICClient()
 	opflexIDEps, err := c.ServiceManager.ListOpflexIDEp()
 	if err != nil {
@@ -446,14 +444,14 @@ func CreateSpanSessionFromCont(cont string, domain string, namespace string, dst
 			tenant := strings.TrimPrefix(s[1], "tn-")
 			ap := strings.TrimPrefix(s[2], "ap-")
 			epg := strings.TrimPrefix(s[3], "epg-")
-			spanConfig.Sessions = append(spanConfig.Sessions, NewSpanCEPSession(opflexIDEp.ContainerName, tenant, ap, epg, opflexIDEp.Mac, dst_ip))
+			spanConfig.Sessions = append(spanConfig.Sessions, NewSpanCEPSession(opflexIDEp.ContainerName, tenant, ap, epg, opflexIDEp.Mac, dstIp))
 			fname := fmt.Sprintf("%s-vspan.yaml", cont)
 			return SaveSpanConfig(spanConfig, fname)
 		}
 	}
 	//fmt.Printf("container %s not found on ACI\n", cont)
-	err_str := fmt.Sprintf("container %s not found on ACI", cont)
-	return errors.New(err_str)
+	errStr := fmt.Sprintf("container %s not found on ACI", cont)
+	return errors.New(errStr)
 }
 
 func PrintAllVSPANSessions() {
@@ -508,11 +506,11 @@ func PrintAllVSPANSessions() {
 					if strings.TrimPrefix(strings.Split(spanDst.DistinguishedName, "/")[2], "vdestgrp-") != models.GetMOName(spanLblMo.DistinguishedName) {
 						continue
 					}
-					epg_attr, err := c.ServiceManager.ReadSpanVEpgSummary(models.GetMOName(spanLblMo.DistinguishedName), models.GetMOName(spanDst.DistinguishedName))
+					epgAttr, err := c.ServiceManager.ReadSpanVEpgSummary(models.GetMOName(spanLblMo.DistinguishedName), models.GetMOName(spanDst.DistinguishedName))
 					if err != nil {
 						isMaxAttempt := false
 						for attempt := 0; attempt < 5; attempt++ {
-							epg_attr, err = c.ServiceManager.ReadSpanVEpgSummary(models.GetMOName(spanLblMo.DistinguishedName), models.GetMOName(spanDst.DistinguishedName))
+							epgAttr, err = c.ServiceManager.ReadSpanVEpgSummary(models.GetMOName(spanLblMo.DistinguishedName), models.GetMOName(spanDst.DistinguishedName))
 							if err == nil || attempt == 5 {
 								if attempt == 5 {
 									isMaxAttempt = true
@@ -527,7 +525,7 @@ func PrintAllVSPANSessions() {
 						}
 
 					}
-					dstipl = fmt.Sprintf("%s %s", dstipl, epg_attr.DstIp)
+					dstipl = fmt.Sprintf("%s %s", dstipl, epgAttr.DstIp)
 				}
 				spanDstIpMap[models.GetMOName(session.DistinguishedName)] = fmt.Sprintf("%s %s", spanDstIpMap[models.GetMOName(session.DistinguishedName)], dstipl)
 			}
@@ -568,9 +566,9 @@ func PrintAllVSPANSessions() {
 			}
 
 			for _, spanRsSrcToVPort := range spanRsSrcToVPortL {
-				session_name_str := strings.TrimPrefix(strings.Split(spanRsSrcToVPort.DistinguishedName, "/")[2], "vsrcgrp-")
-				span_src_name_str := strings.TrimPrefix(strings.Split(spanRsSrcToVPort.DistinguishedName, "/")[3], "vsrc-")
-				if session_name_str != models.GetMOName(session.DistinguishedName) && span_src_name_str != models.GetMOName(spanSrcMo.DistinguishedName) {
+				sessionNameStr := strings.TrimPrefix(strings.Split(spanRsSrcToVPort.DistinguishedName, "/")[2], "vsrcgrp-")
+				spanSrcNameStr := strings.TrimPrefix(strings.Split(spanRsSrcToVPort.DistinguishedName, "/")[3], "vsrc-")
+				if sessionNameStr != models.GetMOName(session.DistinguishedName) && spanSrcNameStr != models.GetMOName(spanSrcMo.DistinguishedName) {
 					continue
 				}
 				tdn := spanRsSrcToVPort.Tdn

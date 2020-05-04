@@ -26,7 +26,7 @@ import (
 var createSessionsCmd = &cobra.Command{
 	Use:   "sessions",
 	Short: "Create ERSPAN session",
-	Long: `Create ERSPAN session`,
+	Long:  `Create ERSPAN session`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 		cont, _ := cmd.Flags().GetString("container")
