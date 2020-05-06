@@ -2,8 +2,8 @@
 **ACI Commander based tool for ERSPAN sessions**
 
 1. Prerequisites
-    i. install go
-    ii. install go-dep
+    * install go
+    * install go-dep
 2. clone the repo
 ```
 mkdir -p $HOME/work/src

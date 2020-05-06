@@ -71,11 +71,11 @@ type Source struct {
 }
 
 type SpanSession struct {
-	Name              string             `mapstructure:"name"`
-	DestinationGroups []DestinationGroup `mapstructure:"destination_groups"`
-	Sources           []Source           `mapstructure:"sources"`
-	AdminState        string             `mapstructure:"admin_state"`
-	State             string             `mapstructure:"state"`
+	Name               string             `mapstructure:"name"`
+	Destination_Groups []DestinationGroup `mapstructure:"destination_groups"`
+	Sources            []Source           `mapstructure:"sources"`
+	Admin_state        string             `mapstructure:"admin_state"`
+	State              string             `mapstructure:"state"`
 }
 
 type SpanConfig struct {
@@ -124,11 +124,11 @@ func NewSpanCEPSession(prefix string, tn string, ap string, epg string, mac stri
 	spanSource.Cep = cep
 
 	//assign destination group to span session
-	spanSession.DestinationGroups = append(spanSession.DestinationGroups, dstGrp)
+	spanSession.Destination_Groups = append(spanSession.Destination_Groups, dstGrp)
 
 	//assign span source to span session
 	spanSession.Sources = append(spanSession.Sources, spanSource)
-	spanSession.AdminState = "start"
+	spanSession.Admin_state = "start"
 	spanSession.State = "present"
 
 	return spanSession
@@ -243,7 +243,7 @@ func ApplyVSPANConfig(config SpanConfig) error {
 	for _, session := range config.Sessions {
 		// Create span session group
 		spanVSrcGrpAttr := models.SpanVSrcGrpAttributes{}
-		spanVSrcGrpAttr.AdminSt = session.AdminState
+		spanVSrcGrpAttr.AdminSt = session.Admin_state
 		sessionState := strings.ToLower(session.State) // present(add) or absent(delete)
 		if sessionState == "present" {
 			spanSrcGrp, err := c.ServiceManager.CreateSpanVSrcGrp(session.Name, desc, spanVSrcGrpAttr)
@@ -254,7 +254,7 @@ func ApplyVSPANConfig(config SpanConfig) error {
 			_ = spanSrcGrp
 
 			// Create span destination groups
-			for _, destg := range session.DestinationGroups {
+			for _, destg := range session.Destination_Groups {
 				dgname := destg.Name
 				spanDstGrp, err := c.ServiceManager.CreateSpanVDestGrp(dgname, desc, models.SpanVDestGrpAttributes{})
 				if err != nil {
@@ -280,7 +280,7 @@ func ApplyVSPANConfig(config SpanConfig) error {
 			}
 
 			// Create source span labels for every destination groups defined in the config
-			for _, destg := range session.DestinationGroups {
+			for _, destg := range session.Destination_Groups {
 				dgname := destg.Name
 				_, err := c.ServiceManager.CreateSpanVSpanLbl(dgname, models.GetMOName(spanSrcGrp.DistinguishedName), desc, models.SpanVSpanLblAttributes{})
 				if err != nil {
@@ -340,7 +340,7 @@ func ApplyVSPANConfig(config SpanConfig) error {
 			}
 
 			// delete all related span destination groups
-			for _, destg := range session.DestinationGroups {
+			for _, destg := range session.Destination_Groups {
 				dgname := destg.Name
 				err := c.ServiceManager.DeleteSpanVDestGrp(dgname)
 				if err != nil {
